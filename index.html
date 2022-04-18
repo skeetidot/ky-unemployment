@@ -6,16 +6,22 @@
     <title>Unemployment Rates in Kentucky: 2001-2013</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
-    <!-- Load JQuery, Leaflet, and Simple Statistics libraries -->
+    <!-- Add Leaflet CSS and Google Fonts -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+    <!-- Add Leaflet, JQuery, and Simple Statistics JavaScript libraries -->
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
     <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
-    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/1.0.0/simple_statistics.min.js"></script>
 
     <!-- Load Papa Parse library to parse a CSV file and convert it to a series of JSON objects -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
-
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
-    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
 
     <style>
         body {
@@ -25,11 +31,11 @@
             font-family: Lato, sans-serif;
             color: #0D0000;
         }
-        
+
         header {
             padding: 6px 10%;
         }
-        
+
         h1 {
             position: absolute;
             z-index: 100;
@@ -42,7 +48,7 @@
             background: rgba(25, 25, 25, 0.8);
             border-radius: 5px;
         }
-        
+
         #map {
             position: absolute;
             width: 100%;
@@ -50,17 +56,17 @@
             bottom: 0;
             background-color: #0e0e0e;
         }
-        
+
         footer {
             padding: 6px 10%;
             width: 80%;
         }
-        
+
         p {
             font-size: 1em;
             color: #001323;
         }
-        
+
         .legend {
             padding: 6px 8px;
             background: rgba(75, 75, 75, 0.8);
@@ -69,7 +75,7 @@
             border-radius: 5px;
             width: 200px;
         }
-        
+
         .legend h3 {
             font-size: 1.2em;
             font-weight: bold;
@@ -77,26 +83,26 @@
             margin: 0 0 10px 0;
             font-family: Lato, sans-serif;
         }
-        
+
         .legend span {
             width: 32px;
             height: 20px;
             float: left;
             margin: 0 10px 4px 0;
         }
-        
+
         .legend label {
             font-size: 1.1em;
             color: whitesmoke;
             font-family: Lato, sans-serif;
         }
-        
+
         .legend label:after {
             content: '';
             display: block;
             clear: both;
         }
-        
+
         .info {
             padding: 6px 8px;
             background: rgba(75, 75, 75, 0.8);
@@ -107,7 +113,7 @@
             text-align: right;
             font-family: Lato, sans-serif;
         }
-        
+
         .info h3 {
             font-size: 1.2em;
             font-weight: bold;
@@ -115,7 +121,7 @@
             margin: 0 0 10px 0;
             font-family: Lato, sans-serif;
         }
-        
+
         #ui-controls {
             width: 176px;
             padding: 8px 15px 8px 15px;
@@ -126,30 +132,30 @@
             bottom: 10px;
             left: 10px;
         }
-        
+
         .year-slider {
             width: 100%;
         }
-        
+
         #ui-controls .min {
             float: left;
         }
-        
+
         #ui-controls .max {
             float: right;
         }
-        
+
         label {
             font-size: 1.1em;
             font-weight: bold;
             font-family: Lato, sans-serif;
         }
-        
+
         .leaflet-popup-content {
             max-width: 200px;
             font-family: Lato, sans-serif;
         }
-        
+
         .leaflet-popup-content h3 {
             margin-bottom: 5px;
             font-family: Lato, sans-serif;
@@ -185,7 +191,7 @@
         // Declare global variables for the Leaflet geoJson data layer, the mapped attribute, and the county name
         var dataLayer, // Leaflet geoJson layer
             attribute = "2001"; // attribute being mapped (the selected year)
-            county = "NAME"; // county name
+        county = "NAME"; // county name
 
         // Use JQuery's getJSON() method to load the ky-counties.json data via AJAX (asynchronously, load data after the page loads to improve performance)
         $.getJSON("ky-counties.json", function (counties) {
@@ -209,7 +215,9 @@
         }).fail(function () {
 
             // The data file failed to load
-            console.log("Sorry, the data could not be loaded. Check that the JSON and CSV files are properly formatted.");
+            console.log(
+                "Sorry, the data could not be loaded. Check that the JSON and CSV files are properly formatted."
+            );
 
         }); // end of getJSON
 
@@ -280,12 +288,12 @@
 
             // Call the function to draw the initial empty legend
             drawLegend();
-    
+
             // Call the function to draw the empty info panel and hide it until the user mouses over a county
             drawInfo();
 
             // Call the function to create the year slider UI
-            createSliderUI();            
+            createSliderUI();
 
             // Call the function to redraw the map symbolized by the selected year and populate the legend for the current year
             updateMap();
@@ -316,7 +324,8 @@
                 });
 
                 // Build the popup with the county name and mapped attribute and bind the popup to the county
-                layer.bindPopup("<h3>" + props[county] + " County</h3>" + attribute + " Unemployment Rate: " + props[attribute] + "%");
+                layer.bindPopup("<h3>" + props[county] + " County</h3>" + attribute + " Unemployment Rate: " +
+                    props[attribute] + "%");
 
                 // When the user hovers over a county (layer)
                 layer.on('mouseover', function () {
@@ -500,15 +509,15 @@
         // Select the slider form element. Leave off the ; to be able to chain the JQuery on() method for the event listener.
         $(".year-slider")
 
-        // When the user changes the slider bar value
-        .on("input change", function () {
+            // When the user changes the slider bar value
+            .on("input change", function () {
 
-            // Assign the current value from the slider bar as the mapped attribute
-            attribute = $(this).val();
+                // Assign the current value from the slider bar as the mapped attribute
+                attribute = $(this).val();
 
-            // Call the function to update the map and legend
-            updateMap();
-        });
+                // Call the function to update the map and legend
+                updateMap();
+            });
 
         // Draw an empty info panel and hide it, so that it won't appear until the user hovers over a county
         function drawInfo() {
